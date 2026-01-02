@@ -84,13 +84,13 @@ function enableAllFields() {
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
     // User not signed in → redirect to login
-    window.location.href = "home.html";
+    window.location.href = "/";
     return;
   }
 
   // User is signed in → redirect to home page
   if (window.location.pathname.endsWith("login.html")) {
-    window.location.href = "home.html";
+    window.location.href = "/dashboard";
     return;
   }
 
@@ -183,7 +183,7 @@ profileForm.addEventListener("submit", async (e) => {
 window.logout = async function () {
   try {
     await signOut(auth);
-    window.location.href = "login.html";
+    window.location.href = "/";
   } catch (err) {
     console.error("Logout failed:", err);
   }

@@ -328,9 +328,14 @@
                 // Show success message
                 btnText.textContent = 'Success! Redirecting...';
                 
+                // Store user info in localStorage for dashboard access
+                localStorage.setItem('userDisplayName', user.displayName);
+                localStorage.setItem('userEmail', user.email);
+                localStorage.setItem('userPhoto', user.photoURL);
+                
                 // Redirect to main app after successful login
                 setTimeout(() => {
-                    window.location.href = './src/Dashboard/dashboard.html';
+                    window.location.href = '/dashboard';
                 }, 1500);
                 
             } catch (error) {
