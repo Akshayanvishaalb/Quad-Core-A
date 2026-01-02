@@ -13,24 +13,28 @@ export default defineConfig({
         login: resolve(__dirname, 'src/LoginProfile/login.html'),
       }
     },
-    // Ensure all HTML files are output to root
     emptyOutDir: true
   },
-  // Custom plugin to flatten HTML output
   plugins: [
     {
-      name: 'flatten-html',
+      name: 'rename-html',
       enforce: 'post',
       generateBundle(options, bundle) {
-        const htmlFiles = Object.keys(bundle).filter(name => name.endsWith('.html'));
-        htmlFiles.forEach(name => {
-          // Rename nested HTML files to root level
-          if (name.includes('/')) {
-            const newName = name.split('/').pop();
-            bundle[newName] = bundle[name];
-            delete bundle[name];
-          }
-        });
+        // Rename dashboard/dashboard.html -> dashboard/index.html
+        if (bundle['dashboard/dashboard.html']) {
+          bundle['dashboard/index.html'] = bundle['dashboard/dashboard.html'];
+          delete bundle['dashboard/dashboard.html'];
+        }
+        // Rename profile/profile.html -> profile/index.html
+        if (bundle['profile/profile.html']) {
+          bundle['profile/index.html'] = bundle['profile/profile.html'];
+          delete bundle['profile/profile.html'];
+        }
+        // Rename login/login.html -> login/index.html
+        if (bundle['login/login.html']) {
+          bundle['login/index.html'] = bundle['login/login.html'];
+          delete bundle['login/login.html'];
+        }
       }
     }
   ]
