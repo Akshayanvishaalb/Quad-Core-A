@@ -1,4 +1,4 @@
-import "../Medical History/MHPS.css"
+import "../MedicalHistory/MHPS.css"
 
 export default function Privacy(){
     const lastUpdateDate = "29/12/2025";

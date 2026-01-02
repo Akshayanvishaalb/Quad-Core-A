@@ -1,4 +1,4 @@
-import "../Medical History/MHPS.css"
+import "../MedicalHistory/MHPS.css"
 export default function Support(){
     return (
         <div className="support">
