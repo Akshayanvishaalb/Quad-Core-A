@@ -16,8 +16,8 @@
   ],
   "rewrites": [
     { "source": "/dashboard", "destination": "/dashboard/dashboard.html" },
-    { "source": "/profile", "destination": "/profile/index.html" },
-    { "source": "/login", "destination": "/login/index.html" },
+    { "source": "/profile", "destination": "/profile/profile.html" },
+    { "source": "/login", "destination": "/login/login.html" },
     { "source": "/", "destination": "/index.html" }
   ]
 }
