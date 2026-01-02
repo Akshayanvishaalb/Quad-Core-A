@@ -11,12 +11,27 @@ export default defineConfig({
         dashboard: resolve(__dirname, 'src/Dashboard/dashboard.html'),
         profile: resolve(__dirname, 'src/LoginProfile/profile.html'),
         login: resolve(__dirname, 'src/LoginProfile/login.html'),
-      },
-      output: {
-        entryFileNames: 'assets/[name]-[hash].js',
-        chunkFileNames: 'assets/[name]-[hash].js',
-        assetFileNames: 'assets/[name]-[hash].[ext]'
+      }
+    },
+    // Ensure all HTML files are output to root
+    emptyOutDir: true
+  },
+  // Custom plugin to flatten HTML output
+  plugins: [
+    {
+      name: 'flatten-html',
+      enforce: 'post',
+      generateBundle(options, bundle) {
+        const htmlFiles = Object.keys(bundle).filter(name => name.endsWith('.html'));
+        htmlFiles.forEach(name => {
+          // Rename nested HTML files to root level
+          if (name.includes('/')) {
+            const newName = name.split('/').pop();
+            bundle[newName] = bundle[name];
+            delete bundle[name];
+          }
+        });
       }
     }
-  }
+  ]
 })
