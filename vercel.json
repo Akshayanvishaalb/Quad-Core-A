@@ -6,6 +6,10 @@
         {
           "key": "Permissions-Policy",
           "value": "browsing-topics=()"
+        },
+        {
+          "key": "Cross-Origin-Opener-Policy",
+          "value": "same-origin-allow-popups"
         }
       ]
     }
