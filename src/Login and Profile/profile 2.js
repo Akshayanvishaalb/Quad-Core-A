@@ -11,17 +11,14 @@ import {
   setDoc
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-const API_KEY = import.meta.env.VITE_Firebase_API_Key
-
 const firebaseConfig = {
-  // apiKey: "",
-  apiKey: API_KEY,
-  authDomain: "quad-core-a.firebaseapp.com",
-  projectId: "quad-core-a",
-  storageBucket: "quad-core-a.firebasestorage.app",
-  messagingSenderId: "702554879008",
-  appId: "1:702554879008:web:c502334c89adb58f8f3845",
-  measurementId: "G-L8ZCNH62LF"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyDXi-16h6fqkvFhyh96rHPSrcUUYI-r1Lw",
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "quad-core-a.firebaseapp.com",
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "quad-core-a",
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "quad-core-a.firebasestorage.app",
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "702554879008",
+  appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:702554879008:web:c502334c89adb58f8f3845",
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || "G-L8ZCNH62LF"
 };
 
 const app = initializeApp(firebaseConfig);
