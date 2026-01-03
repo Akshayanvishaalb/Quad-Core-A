@@ -29,23 +29,6 @@ export default defineConfig({
     {
       name: 'rename-html',
       enforce: 'post',
-      // generateBundle(_, bundle) {
-      //   const rename = (from, to) => {
-      //     if (bundle[from]) {
-      //       bundle[to] = bundle[from]
-      //       delete bundle[from]
-      //     }
-      //   }
-      //
-      //   rename('dashboard/dashboard.html', 'dashboard/index.html')
-      //   rename('profile/profile.html', 'profile/index.html')
-      //   rename('login/login.html', 'login/index.html')
-      //   rename('reports/reports.html', 'reports/index.html')
-      //   rename('prescriptions/index.html', 'prescriptions/index.html')
-      //   rename('privacy/Privacy.html', 'privacy/index.html')
-      //   rename('support/Support.html', 'support/index.html')
-      //   rename('medicalHistory/MedicalHistory.html', 'medical-history/index.html')
-      // }
 
       generateBundle(_, bundle) {
         const rename = (from, to) => {
@@ -55,13 +38,6 @@ export default defineConfig({
               bundle[from].source = bundle[from].source.replace(
                   /<script type="module" crossorigin src="\/assets\/dashboard-[^"]+\.js"><\/script>/,
                   '<script type="module" src="../../assets/dashboard.js"></script>'
-              );
-            }
-
-            if (to.includes('settings')) {
-              bundle[from].source = bundle[from].source.replace(
-                  /<script src="settings-[^"]+\.js"><\/script>/,
-                  '<script src="../../assets/settings.js"></script>'
               );
             }
 
