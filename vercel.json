@@ -21,7 +21,7 @@
     { "source": "/prescriptions", "destination": "/src/Prescriptions/index.html" },
     { "source": "/privacy", "destination": "/src/PrivacySupport/Privacy.html" },
     { "source": "/support", "destination": "/src/PrivacySupport/Support.html" },
-    { "source": "/medical-history", "destination": "/src/Medical History/MedicalHistory.html" },
+    { "source": "/medical-history", "destination": "/src/MedicalHistory/MedicalHistory.html" },
     { "source": "^/$", "destination": "/src/index.html" }
   ]
 }
