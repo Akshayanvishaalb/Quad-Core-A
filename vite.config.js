@@ -57,6 +57,14 @@ export default defineConfig({
                   '<script type="module" src="../../assets/dashboard.js"></script>'
               );
             }
+
+            if (to.includes('settings')) {
+              bundle[from].source = bundle[from].source.replace(
+                  /<script src="settings-[^"]+\.js"><\/script>/,
+                  '<script src="../../assets/settings.js"></script>'
+              );
+            }
+
             bundle[to] = bundle[from];
             delete bundle[from];
           }
