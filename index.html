@@ -335,7 +335,13 @@
                 
                 // Redirect to main app after successful login
                 setTimeout(() => {
-                    window.location.href = '/dashboard';
+                    // window.location.href = '/dashboard';
+                    if (import.meta.env.DEV) {
+                        window.location.href = './src/Dashboard/dashboard.html';
+                    }
+                    else {
+                        window.location.href = '/dashboard';
+                    }
                 }, 1500);
                 
             } catch (error) {

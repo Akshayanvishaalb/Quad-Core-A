@@ -206,15 +206,17 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  margin-top: 50px;
+  margin-top: 0px; /* 50px */
   width: 100%;
-  height: 100vh;
+  /*height: 100vh;*/
+  height: 100%;
 }
 
 .prompt {
-  font-size: 26px;
+  font-size: 32px;
   font-weight: 400;
-  margin-bottom: 40px;
+  margin-bottom: 0px; /* 50px */
+  color: #4e4e4e;
 }
 
 /* Input box */
@@ -269,7 +271,7 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  margin-top: -220px;
+  margin-bottom: 10%;
 }
 
 .HStack {
@@ -277,6 +279,9 @@ body {
   flex-direction: row;
   align-items: center;
   justify-content: center;
+  margin-bottom: 0px; /* 60px */
+  padding-top: 40px;
+  padding-bottom: 60px;
 }
 
 /* Suggestions */
@@ -468,16 +473,33 @@ body {
 
 .main.chat-started .InitialContent {
   margin-top: 0;
+  margin-bottom: 0;  /* 80px */
+}
+
+.main.chat-started .HStack {
+  padding-top: 0;
+  padding-bottom: 0;
 }
 
 .main.chat-started {
   justify-content: flex-start;
 }
 
+
+.main.chat-started #chatContainer {
+  height: calc(100vh - 190px);
+  padding-top: 20px;
+}
+
 /* Optional: spacing for chat */
 #chatContainer {
-  margin-top: 60px;
-  width: 780px;
+  margin-top: 10px;
+  margin-bottom: 40px;
+  width: 790px;
+  /*height: 70vh;*/
+  /*justify-content: flex-start;*/
+  /*border: 1px solid red;*/
+  overflow-y: auto;
 }
 
 #chatContainer * {
