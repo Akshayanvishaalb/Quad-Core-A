@@ -6,11 +6,13 @@ function toggleSidebar() {
     sidebarSeparator.classList.toggle("collapsed");
     sidebarSeparator.classList.toggle("expanded");
 }
+window.toggleSidebar = toggleSidebar;
 
 function toggleProfileMenu() {
     const menu = document.getElementById("profileMenu");
     menu.classList.toggle("active");
 }
+window.toggleProfileMenu = toggleProfileMenu;
 
 /* Close dropdown when clicking outside */
 document.addEventListener("click", function (event) {
