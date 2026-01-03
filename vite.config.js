@@ -18,7 +18,9 @@ export default defineConfig({
         privacy: resolve(__dirname, 'src/PrivacySupport/Privacy.html'),
         support: resolve(__dirname, 'src/PrivacySupport/Support.html'),
 
-        medicalHistory: resolve(__dirname, 'src/MedicalHistory/MedicalHistory.html')
+        medicalHistory: resolve(__dirname, 'src/MedicalHistory/MedicalHistory.html'),
+
+        settings: resolve(__dirname, 'src/Settings/settings.html')
       }
     },
     emptyOutDir: true
@@ -68,6 +70,7 @@ export default defineConfig({
         rename('privacy/Privacy.html', 'privacy/index.html')
         rename('support/Support.html', 'support/index.html')
         rename('medicalHistory/MedicalHistory.html', 'medical-history/index.html')
+        rename('settings/settings.html', 'settings/index.html')
       }
 
     }
