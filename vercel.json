@@ -16,8 +16,8 @@
   ],
   "rewrites": [
     { "source": "/dashboard", "destination": "/src/Dashboard/dashboard.html" },
-    { "source": "/profile", "destination": "/src/LoginProfile/profile.html" },
     { "source": "/reports", "destination": "/src/Reports/reports.html" },
+    { "source": "/profile", "destination": "/src/LoginProfile/profile.html" },
     { "source": "/prescriptions", "destination": "/src/Prescriptions/prescriptions.html" },
     { "source": "/privacy", "destination": "/src/PrivacySupport/Privacy.html" },
     { "source": "/support", "destination": "/src/PrivacySupport/Support.html" },
