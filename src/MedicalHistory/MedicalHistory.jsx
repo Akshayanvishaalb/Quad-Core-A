@@ -1,5 +1,28 @@
 import React from "react";
-import "../MHPS.css"
+import ReactDOM from "react-dom/client";
+import "./MHPS.css";
+
+// import { db, auth } from "../firebase";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+// import { doc, getDoc, setDoc } from "firebase/firestore";
+
+const firebaseConfig = {
+    // apiKey: "AIzaSyDXi-16h6fqkvFhyh96rHPSrcUUYI-r1Lw",
+    apiKey: import.meta.env.VITE_Firebase_API_Key,
+    authDomain: "quad-core-a.firebaseapp.com",
+    projectId: "quad-core-a",
+    storageBucket: "quad-core-a.firebasestorage.app",
+    messagingSenderId: "702554879008",
+    appId: "1:702554879008:web:c502334c89adb58f8f3845",
+    measurementId: "G-L8ZCNH62LF"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
 
 export default function MedicalHistory(){
     const [conditions, setConditions] = React.useState([]); // store firebase data in default state instead of empty list
@@ -7,6 +30,21 @@ export default function MedicalHistory(){
     const [surgeries, setSurgeries] = React.useState([]);
     const [chronics, setChronics] = React.useState([]);
     const [note, setNote] = React.useState("");
+
+    // For Firebase user authentication
+    const [user, setUser] = React.useState(null);
+    const [authReady, setAuthReady] = React.useState(false);
+
+    React.useEffect(() => {
+        const unsub = auth.onAuthStateChanged(u => {
+            setUser(u);
+            setAuthReady(true);
+        });
+
+        return unsub;
+    }, []);
+    // Till here and will continue later
+
 
     const [form, setForm] = React.useState(
         {
@@ -16,6 +54,93 @@ export default function MedicalHistory(){
             chronic: ""
         }
     );
+
+
+    // React.useEffect(() => {
+    //     const loadHistory = async () => {
+    //         const user = auth.currentUser;
+    //         if (!user) return;
+    //
+    //         const ref = doc(db, "users", user.uid, "medicalHistory", "data");
+    //         const snap = await getDoc(ref);
+    //
+    //         if (snap.exists()) {
+    //         const d = snap.data();
+    //         setConditions(d.conditions || []);
+    //         setAllergies(d.allergies || []);
+    //         setSurgeries(d.surgeries || []);
+    //         setChronics(d.chronics || []);
+    //         setNote(d.note || "");
+    //         } else {
+    //         await setDoc(ref, {
+    //             conditions: [],
+    //             allergies: [],
+    //             surgeries: [],
+    //             chronics: [],
+    //             note: ""
+    //         });
+    //         }
+    //     };
+    //
+    //     loadHistory();
+    // }, []);
+
+    React.useEffect(() => {
+        if (!authReady || !user) return;
+
+        const loadHistory = async () => {
+            const ref = doc(db, "users", user.uid, "medicalHistory", "data");
+            const snap = await getDoc(ref);
+
+            if (snap.exists()) {
+                const d = snap.data();
+                setConditions(d.conditions || []);
+                setAllergies(d.allergies || []);
+                setSurgeries(d.surgeries || []);
+                setChronics(d.chronics || []);
+                setNote(d.note || "");
+            } else {
+                await setDoc(ref, {
+                    conditions: [],
+                    allergies: [],
+                    surgeries: [],
+                    chronics: [],
+                    note: ""
+                });
+            }
+        };
+
+        loadHistory();
+    }, [authReady, user]);
+
+
+    // async function saveToFirestore(field, value) {
+    //     const user = auth.currentUser;
+    //     console.log("Saving to Firestore", auth.currentUser);  // <- I added this debug statement
+    //     if (!user) return;
+    //
+    //     await setDoc(
+    //         // doc(db, "users", user.uid, "medicalHistory"),
+    //         doc(db, "users", user.uid, "medicalHistory", "data"),
+    //         { [field]: value },
+    //         { merge: true }
+    //     );
+    // }
+
+    async function saveToFirestore(field, value) {
+        if (!user) {
+            console.warn("Auth not ready, skipping Firestore write");
+            return;
+        }
+
+        await setDoc(
+            doc(db, "users", user.uid, "medicalHistory", "data"),
+            { [field]: value },
+            { merge: true }
+        );
+    }
+
+
     function handleChange(e){
         setForm({
             ...form,
@@ -23,190 +148,104 @@ export default function MedicalHistory(){
         });
     }
 
-    function addCondition(){
-        setConditions(prevConditions => {
-            let condition = form.condition;
-            if (condition){
-                let valid = false, alreadyPresent = false;
-                for (let i = 0; i<prevConditions.length; i++){
-                    if (prevConditions[i] === condition){
-                        alreadyPresent = true;
-                        break
-                    }
-                }
-                for (let i = 0; i<condition.length; i++){
-                    if (condition[i] != " "){
-                        valid = true;
-                        break;
-                    }
-                }
+    function addCondition() {
+        const value = form.condition.trim();
+        if (
+            !value ||
+            conditions.some(c => c.toLowerCase() === value.toLowerCase())
+            ) return;
 
-                if (valid && !(alreadyPresent)){
-                    return [...prevConditions, condition];
-                }
-                
-                else{
-                    return prevConditions;
-                }
-            }
-            else return prevConditions;
-        });
 
-        setForm({...form, condition: ""});
+        const updated = [...conditions, value];
+        setConditions(updated);
+        saveToFirestore("conditions", updated);
+
+        setForm({ ...form, condition: "" });
     }
 
-    function addAllergy(){
-        setAllergies(prevAllergies => {
-            let allergy = form.allergy;
-            if (allergy){
-                let valid = false, alreadyPresent = false;
-                for (let i = 0; i<prevAllergies.length; i++){
-                    if (prevAllergies[i] === allergy){
-                        alreadyPresent = true;
-                        break
-                    }
-                }
-                for (let i = 0; i<allergy.length; i++){
-                    if (allergy[i] != " "){
-                        valid = true;
-                        break;
-                    }
-                }
 
-                if (valid && !(alreadyPresent)){
-                    return [...prevAllergies, allergy];
-                }
-                
-                else{
-                    return prevAllergies;
-                }
-            }
-            else return prevAllergies;
-        })
-        setForm({...form, allergy:""})
+    function addAllergy(){
+        const value = form.allergy.trim();
+        if (
+            !value ||
+            allergies.some(a => a.toLowerCase() === value.toLowerCase())
+            ) return;
+
+        const updated = [...allergies, value];
+        setAllergies(updated);
+        saveToFirestore("allergies", updated);
+
+        setForm({ ...form, allergy: "" });
     }
 
     function addSurgery(){
-        setSurgeries(prevSurgeries => {
-            let surgery = form.surgery;
-            if (surgery){
-                let valid = false, alreadyPresent = false;
-                for (let i = 0; i<prevSurgeries.length; i++){
-                    if (prevSurgeries[i] === surgery){
-                        alreadyPresent = true;
-                        break
-                    }
-                }
-                for (let i = 0; i<surgery.length; i++){
-                    if (surgery[i] != " "){
-                        valid = true;
-                        break;
-                    }
-                }
+        const value = form.surgery.trim();
+        if (
+            !value ||
+            surgeries.some(s => s.toLowerCase() === value.toLowerCase())
+            ) return;
 
-                if (valid && !(alreadyPresent)){
-                    return [...prevSurgeries, surgery];
-                }
-                
-                else{
-                    return prevSurgeries;
-                }
-            }
-            else return prevSurgeries;
-        })
+        const updated = [...surgeries, value];
+        setSurgeries(updated);
+        saveToFirestore("surgeries", updated);
+
         setForm({...form, surgery:""})
     }
 
     function addChronic(){
-        setChronics(prevChronics => {
-            let chronic = form.chronic;
-            if (chronic){
-                let valid = false, alreadyPresent = false;
-                for (let i = 0; i<prevChronics.length; i++){
-                    if (prevChronics[i] === chronic){
-                        alreadyPresent = true;
-                        break
-                    }
-                }
-                for (let i = 0; i<chronic.length; i++){
-                    if (chronic[i] != " "){
-                        valid = true;
-                        break;
-                    }
-                }
+        const value = form.chronic.trim();
+        if (
+            !value ||
+            chronics.some(c => c.toLowerCase() === value.toLowerCase())
+            ) return;
+        const updated = [...chronics, value];
+        setChronics(updated);
+        saveToFirestore("chronics", updated);
 
-                if (valid && !(alreadyPresent)){
-                    return [...prevChronics, chronic];
-                }
-                
-                else{
-                    return prevChronics;
-                }
-            }
-            else return prevChronics;
-        })
         setForm({...form, chronic: ""});
     }
 
 
-    function removeCondition(condition){
-        setConditions(
-            prevConditions => {
-                const newConditions = [];
-                for (let i = 0; i<prevConditions.length; i++){
-                    if (prevConditions[i].toLowerCase() != condition.toLowerCase()){
-                        newConditions.push(prevConditions[i])
-                    }
-                }
-                return newConditions;
-            }
+    function removeCondition(condition) {
+        const updated = conditions.filter(
+            c => c.toLowerCase() !== condition.toLowerCase()
         );
+
+        setConditions(updated);
+        saveToFirestore("conditions", updated);
     }
 
+
     function removeAllergy(allergy){
-        setAllergies(
-            prevAllergies => {
-                const newAllergies = [];
-                for (let i = 0; i<prevAllergies.length; i++){
-                    if (prevAllergies[i].toLowerCase() != allergy.toLowerCase()){
-                        newAllergies.push(prevAllergies[i])
-                    }
-                }
-                return newAllergies;
-            }
+        const updated = allergies.filter(
+            a => a.toLowerCase() !== allergy.toLowerCase()
         );
+
+        setAllergies(updated);
+        saveToFirestore("allergies", updated);
     }
 
     function removeSurgery(surgery){
-        setSurgeries(
-            prevSurgeries => {
-                const newSurgeries = [];
-                for (let i = 0; i<prevSurgeries.length; i++){
-                    if (prevSurgeries[i].toLowerCase() != surgery.toLowerCase()){
-                        newSurgeries.push(prevSurgeries[i])
-                    }
-                }
-                return newSurgeries;
-            }
+       const updated =surgeries.filter(
+            s => s.toLowerCase() !== surgery.toLowerCase()
         );
+
+        setSurgeries(updated);
+        saveToFirestore("surgeries", updated);
     }
 
     function removeChronic(chronic){
-        setChronics(
-            prevChronic => {
-                const newChronic = [];
-                for (let i = 0; i<prevChronic.length; i++){
-                    if (prevChronic[i].toLowerCase() != chronic.toLowerCase()){
-                        newChronic.push(prevChronic[i])
-                    }
-                }
-                return newChronic;
-            }
+        const updated = chronics.filter(
+            c => c.toLowerCase() !== chronic.toLowerCase()
         );
+
+        setChronics(updated);
+        saveToFirestore("chronics", updated);
     }
 
     return (
-        <div className="med-history-page">
+        <div className="medical-historyContainer">
+            <div className="med-history-page">
             <h2 className="history-title">Medical History</h2>
             <div className = "cards">
                 <div className="card">
@@ -259,6 +298,7 @@ export default function MedicalHistory(){
                 </div>
             </div>
         </div>
+        </div>
     );
 }
 
@@ -296,3 +336,9 @@ function InputRow({ name, value, placeholder, onChange, onAdd }) {
         </div>
     );
 }
+
+ReactDOM.createRoot(document.getElementById("root")).render(
+    <React.StrictMode>
+        <MedicalHistory />
+    </React.StrictMode>
+);
