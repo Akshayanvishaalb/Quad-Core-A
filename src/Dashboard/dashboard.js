@@ -1,24 +1,5 @@
 import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
 
-// function toggleSidebar() {
-//     const sidebar = document.getElementById("sidebar");
-//     sidebar.classList.toggle("collapsed");
-//     sidebar.classList.toggle("expanded");
-// }
-//
-// function toggleProfileMenu() {
-//     const menu = document.getElementById("profileMenu");
-//     menu.classList.toggle("active");
-// }
-//
-// /* Close dropdown when clicking outside */
-// document.addEventListener("click", function (event) {
-//     const profile = document.querySelector(".profile-wrapper");
-//     if (!profile.contains(event.target)) {
-//         document.getElementById("profileMenu").classList.remove("active");
-//     }
-// });
-
 
 // ========================== Voice to Speech =======================
 const micBtn = document.getElementById('micBtn');
@@ -135,6 +116,8 @@ textInput.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
         // sendBtn.click();
         console.log('Entered');
+
+        appendUserInput(textInput.value.trim());
     }
 });
 
@@ -151,10 +134,9 @@ textInput.addEventListener('keydown', (e) => {
 
 // ======================= GEMNI ========================
 
-const API_KEY = import.meta.env.VITE_Gemni_API_Key
+// import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
 
-
-// const API_KEY = ""; // demo only
+const API_KEY = import.meta.env.VITE_Gemni_API_Key;
 const genai = new GoogleGenerativeAI(API_KEY);
 
 const firstAidModel = genai.getGenerativeModel({
@@ -162,38 +144,74 @@ const firstAidModel = genai.getGenerativeModel({
     systemInstruction: `
 You are a first-aid guidance assistant.
 
-Rules:
-- Provide ONLY safe, non-emergency first-aid steps
+Your role:
+- Provide ONLY safe, general, non-emergency first-aid or self-care steps
+- Use prior conversation context for follow-up questions
+
+Strict rules:
 - NO diagnosis
 - NO medications
-- NO emergency escalation
-- Return empty list if severe symptoms are implied
+- NO medical claims
+- NO emergency instructions like calling ambulances or giving CPR steps
 
-Output ONLY valid JSON.
-DO NOT wrap in markdown.
+Emergency handling (IMPORTANT):
+- If symptoms suggest a potentially serious or worsening condition,
+  do NOT provide first-aid steps.
+- Respond with a calm message advising professional medical consultation.
+
+Output rules:
+- Output ONLY valid JSON
+- DO NOT wrap in markdown
+- Use this exact JSON format:
+
+{
+  "emergency": true | false,
+  "message": "string",
+  "first_aid_steps": []
+}
+
+Behavior:
+- Non-emergency → emergency=false, provide steps
+- Potential emergency → emergency=true, empty steps
 `
 });
 
+// =========================
+// DOM ELEMENTS
+// =========================
 const input = document.getElementById("textInput");
-// const sendBtn = document.getElementById("sendBtn");
 const chat = document.getElementById("chatContainer");
 
-// sendBtn.addEventListener("click", sendMessage);
+// =========================
+// MEMORY
+// =========================
+let conversationMemory = [];
+const MAX_TURNS = 6; // 3 user + 3 assistant
+
 input.addEventListener("keydown", e => {
     if (e.key === "Enter") sendMessage();
 });
 
+// =========================
+// MAIN FUNCTION
+// =========================
 async function sendMessage() {
     const text = input.value.trim();
     if (!text) return;
 
-    // append("You", text);
-    // input.value = "";
+    input.value = "";
+
+    conversationMemory.push({
+        role: "user",
+        content: text
+    });
+
+    conversationMemory = conversationMemory.slice(-MAX_TURNS);
 
     try {
-        const response = await firstAidModel.generateContent(
-            JSON.stringify({ symptoms_text: text })
-        );
+        const prompt = buildPrompt(text);
+
+        const response = await firstAidModel.generateContent(prompt);
 
         let raw = response.response.text()
             .replace(/```json/g, "")
@@ -201,25 +219,72 @@ async function sendMessage() {
             .trim();
 
         const parsed = JSON.parse(raw);
-        append("First Aid", JSON.stringify(parsed, null, 2));
+        // append(JSON.stringify(parsed, null, 2));
+        append(formatResponseToString(parsed));
+
+        conversationMemory.push({
+            role: "assistant",
+            content: raw
+        });
+
+        conversationMemory = conversationMemory.slice(-MAX_TURNS);
 
     } catch (err) {
         console.error(err);
-        append("System", "Unable to generate first-aid guidance.");
+        append("Unable to generate first-aid guidance.");
     }
 }
 
-function append(sender, message) {
+// =========================
+// PROMPT BUILDER
+// =========================
+function buildPrompt(currentInput) {
+    return `
+PAST CONTEXT:
+${conversationMemory
+        .map(m => `${m.role.toUpperCase()}: ${m.content}`)
+        .join("\n")}
+
+CURRENT INPUT:
+${currentInput}
+`;
+}
+
+// =========================
+// UI APPEND (UNCHANGED STYLE)
+// =========================
+
+function formatResponseToString(parsed) {
+    let output = parsed.message || "";
+
+    if (Array.isArray(parsed.first_aid_steps) && parsed.first_aid_steps.length > 0) {
+        output += "\n\nFirst Aid:\n";
+        output += parsed.first_aid_steps.join("\n");
+    }
+
+    return output;
+}
+
+
+
+function append(message) {
     const div = document.createElement("div");
     div.className = "chat-message";
-    // div.innerHTML = `<strong>${sender}:</strong><pre>${message}</pre>`;
     div.innerHTML = `${message}`;
     chat.appendChild(div);
     chat.scrollTop = chat.scrollHeight;
 
     const mainUI = document.getElementById("mainUI");
-
-    // Activate UI transition once chat starts
-    mainUI.classList.add("chat-started");
+    mainUI?.classList.add("chat-started");
 }
 
+function appendUserInput(message) {
+    const div = document.createElement("div");
+    div.className = "chat-message-user";
+    div.innerHTML = `${message}`;
+    chat.appendChild(div);
+    chat.scrollTop = chat.scrollHeight;
+
+    const mainUI = document.getElementById("mainUI");
+    mainUI?.classList.add("chat-started");
+}

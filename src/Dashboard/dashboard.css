@@ -493,9 +493,12 @@ body {
 
 /* Optional: spacing for chat */
 #chatContainer {
+  display: flex;
+  flex-direction: column;
   margin-top: 10px;
   margin-bottom: 40px;
   width: 790px;
+  gap: 36px;
   /*height: 70vh;*/
   /*justify-content: flex-start;*/
   /*border: 1px solid red;*/
@@ -505,5 +508,22 @@ body {
 #chatContainer * {
   font-family: Georgia;
   font-size: large;
+}
+
+.chat-message {
+  margin-top: -30px;
+  margin-bottom: 30px;
+}
+
+.chat-message-user {
+  align-self: flex-end;
+  text-align: right;
+  padding: 10px 16px;
+  background: #2563eb;
+  color: white;
+  border-radius: 40px;
+  border-bottom-right-radius: 4px;
+  box-shadow: 0 0 20px rgba(200,200,200,0.5);
+  margin: 0 20px 20px 0;
 }
 
