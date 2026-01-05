@@ -29,7 +29,7 @@
 // }
 
 
-function triggerSOS() {
+export function triggerSOS() {
     const modal = document.getElementById("sosModal");
     const output = document.getElementById("modalOutput");
 
@@ -52,11 +52,19 @@ function triggerSOS() {
             output.innerText = "Location captured...\nSending SOS...";
 
             try {
-                const res = await fetch("http://localhost:4000/sos", {
+                // const res = await fetch("http://localhost:4000/sos", {
+                //     method: "POST",
+                //     headers: { "Content-Type": "application/json" },
+                //     body: JSON.stringify(data)
+                // });
+
+                // The above is modified for vercel deploymet by below
+                const res = await fetch("/api/sos", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(data)
                 });
+
 
                 const result = await res.json();
                 output.innerText = JSON.stringify(result, null, 2);
@@ -67,6 +75,8 @@ function triggerSOS() {
         () => output.innerText = "Location access denied"
     );
 }
+
+window.triggerSOS = triggerSOS;
 
 // Close modal when clicking X
 document.getElementById("closeModal").onclick = () => {
