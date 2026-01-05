@@ -324,6 +324,14 @@
                 </svg>
                 <span id="guestBtnText">Continue as Guest</span>
             </button>
+
+            <div class="guest-popup" id="guestPopup">
+                <div class="popup-content">
+                    <h3>Continue as Guest</h3>
+                    <p>For the full experience, please sign in with Google.</p>
+                    <button id="closePopup">Continue as Guest</button>
+                </div>
+            </div>
             
             <div class="divider">Why choose CureOn?</div>
             
@@ -391,7 +399,7 @@
         const closeBtn = document.getElementById("closePopup");
 
         document.getElementById("closePopup").addEventListener("click", () => {
-            window.location.href = "dashboard.html";
+            window.location.href = "/dashboard";
         });
 
         guestBtn.addEventListener("click", () => {
