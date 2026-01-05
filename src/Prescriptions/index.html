@@ -9,7 +9,7 @@
 
 <div class="container">
   <h1>Prescriptions</h1>
-
+  <div id="uploadFlow">
   <div class="upload-card">
     <h3>Upload Prescription</h3>
 
@@ -18,18 +18,50 @@
       <label for="prescriptionFile" class="file-label">📁 Choose Prescription File</label>
       <span id="fileName">No file chosen</span>
     </div>
-
-    <input type="text" id="prescriptionName" placeholder="Prescription Name (e.g. Fever Treatment)" />
-    <input type="text" id="doctorName" placeholder="Doctor Name" />
-    <input type="date" id="prescribedDate" />
-
     <button id="uploadBtn">Upload</button>
-  </div>
+    <div class="auto-detected" id="autoDetectedSection" style="display:none;">
+      <h3>Auto-Detected Prescription Details</h3>
 
+      <div class="detected-field">
+        <label>Doctor Name <span class="detected-label">Detected from prescription</span></label>
+        <div class="editable">
+          <input type="text" id="detDoctor"/>
+        </div>
+      </div>
+
+      <div class="detected-field">
+        <label>Date <span class="detected-label">Detected from prescription</span></label>
+        <div class="editable">
+          <input type="date" id="detDate"/>
+        </div>
+      </div>
+
+      <h4>Medicines</h4>
+      <table class="med-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Dosage</th>
+            <th>Frequency</th>
+            <th>Duration</th>
+          </tr>
+        </thead>
+        <tbody id="medicinesBody"></tbody>
+      </table>
+    </div>
+  </div>
+  </div>
   <div class="prescription-list" id="prescriptionSection" style="display:none;">
     <h3>Your Prescriptions</h3>
     <div id="prescriptionContainer"></div>
   </div>
+  <div class="prescription-list" id="pastPrescriptions">
+  <h3>Past Prescriptions</h3>
+  <div id="pastPrescriptionContainer">
+    <p class="empty">No prescriptions uploaded yet.</p>
+  </div>
+</div>
+
 </div>
 
 <!--<script src="../common/theme.js"></script>-->
