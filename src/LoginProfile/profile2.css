@@ -77,3 +77,66 @@ button {
   background: #94a3b8;
   cursor: not-allowed;
 }
+
+/* ============ Dark Mode ========== */
+.dark-modePrimary {
+  background: #01020b;
+}
+
+.dark-modeSecondary {
+  background: #030616;
+  border: 1px solid #244563;
+  box-shadow: 0 20px 45px rgba(56, 189, 248, 0.35);
+}
+
+.dark-modeSecondary h1 {
+  color: white;
+}
+
+.dark-modeSecondary input {
+  background: #05091c;
+  border: 1px solid rgba(166, 166, 166, 0.5);
+  color: white;
+}
+
+.dark-modeSecondary input:disabled {
+  background: #030616;
+  border: 1px solid rgba(166, 166, 166, 0.5);
+  color: white;
+}
+
+.dark-modeSecondary select {
+  background: #05091c;
+  border: 1px solid rgba(166, 166, 166, 0.5);
+  color: white;
+}
+
+.dark-modeSecondary select:disabled {
+  background: #030616;
+  border: 1px solid rgba(166, 166, 166, 0.5);
+  color: white;
+}
+
+.dark-modeSecondary textarea {
+  background: #05091c;
+  border: 1px solid rgba(166, 166, 166, 0.5);
+  color: white;
+  border-radius: 10px;
+  padding: 6px;
+}
+
+.dark-modeSecondary textarea:disabled {
+  background: #030616;
+  border: 1px solid rgba(166, 166, 166, 0.5);
+  color: white;
+  border-radius: 10px;
+  padding: 6px;
+}
+
+.dark-modeSaveButton {
+  background: linear-gradient(135deg, #2563eb, #38bdf8);
+}
+
+.dark-modeSaveButton button:disabled {
+  background: linear-gradient(135deg, #2563eb, #38bdf8);
+}

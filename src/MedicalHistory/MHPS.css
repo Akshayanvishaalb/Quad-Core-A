@@ -192,3 +192,35 @@ button:focus-visible {
   border-radius: 7px;
   font-weight: 600;
 }
+
+
+/* ================ Dark Mode ================ */
+.dark-modePrimary {
+  background: #01020b;
+}
+
+.dark-modePrimary h2 {
+  color: white;
+}
+
+.dark-modeSecondary {
+  background: #030616;
+  border: 1px solid #244563;
+  box-shadow: 0 20px 45px rgba(56, 189, 248, 0.35);
+  color: white;
+}
+
+.dark-modeSecondary h4 {
+  color: white;
+}
+
+.dark-modeSecondary button {
+  background: linear-gradient(135deg, #2563eb, #38bdf8);
+  border: none;
+}
+
+.dark-modePrimaryPrivacySupport {
+  background: #01020b;
+  color: white;
+}
+

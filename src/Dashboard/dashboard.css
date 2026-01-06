@@ -527,3 +527,51 @@ body {
   margin: 0 20px 20px 0;
 }
 
+/* ============== Dark Mode =================== */
+.dark-modePrimary {
+  background: #01020b;
+  border-color: #244563;
+  color: white;
+}
+
+.dark-modePrimary span {
+  color: white;
+}
+
+.dark-modePrimary h1 {
+  color: white;
+}
+
+.dark-modePrimary li:hover {
+  border: 1px solid #244563;
+  background: transparent;
+}
+
+.dark-modeSecondary {
+  background: #030616;
+  border: 1px solid #244563;
+  box-shadow: 0 20px 45px rgba(56, 189, 248, 0.35);
+}
+
+.dark-modeSecondary a {
+  color: white;
+}
+
+.dark-modeSuggestions button {
+  background: #030616;
+  color: white;
+  border: 0.5px solid #244563;
+  /*box-shadow: 0 20px 45px rgba(56, 189, 248, 0.35);*/
+}
+.dark-modeSuggestions button:hover {
+  background: #244563;
+  color: white;
+  border: 0.5px solid #244563;
+  transition: ease 0.5s;
+  /*box-shadow: 0 20px 45px rgba(56, 189, 248, 0.35);*/
+}
+
+.dark-modeTextInput {
+  background: #030616;
+  color: white;
+}

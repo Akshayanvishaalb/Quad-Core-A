@@ -7,12 +7,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>cureon</title>
   </head>
-<!--  <body>-->
-<!--    <div id="root"></div>-->
-<!--    <script type="module" src="/src/main.jsx"></script>-->
-
-<!--    <script type="module" src="/src/main.jsx"></script>-->
-<!--  </body>-->
 
   <body>
 
@@ -90,7 +84,7 @@
     <div class="app-title">CureOn</div>
 
     <!-- MAIN CONTENT -->
-    <div class="content">
+    <div class="content" id="contentContainer">
 
       <!-- PROFILE -->
       <div class="profile-wrapper">
@@ -116,7 +110,7 @@
           <h1 class="prompt">How are you feeling today?</h1>
 
           <div class="HStack">
-            <div class="input-box">
+            <div class="input-box" id="inputBox">
               <input type="text" placeholder="How can I support you?" id="textInput">
             </div>
             <button class="input-mic" id="micBtn">🎤</button>
@@ -128,12 +122,12 @@
             </button>
           </div>
 
-          <div class="suggestions">
-            <button>When was my last visit?</button>
-            <button>Show my health summary</button>
-            <button>Find doctors nearby</button>
-            <button>What's my height as of last month?</button>
-            <button>When is my next appointment?</button>
+          <div class="suggestions" id="suggestions">
+            <button id="sug1">When was my last visit?</button>
+            <button id="sug2">Show my health summary</button>
+            <button id="sug3">Find doctors nearby</button>
+            <button id="sug4">What's my height as of last month?</button>
+            <button id="sug5">When is my next appointment?</button>
           </div>
         </div>
       </main>

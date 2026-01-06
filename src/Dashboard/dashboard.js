@@ -288,3 +288,20 @@ function appendUserInput(message) {
     const mainUI = document.getElementById("mainUI");
     mainUI?.classList.add("chat-started");
 }
+
+
+/* ============== Dark Mode =================== */
+
+if (localStorage.getItem("darkMode") === "true") {
+    // Sidebar
+    document.getElementById("sidebar").classList.add("dark-modePrimary");
+
+    // Main content
+    document.getElementById("contentContainer").classList.add("dark-modePrimary");
+    document.getElementById("inputBox").classList.add("dark-modeSecondary");
+    document.getElementById("textInput").classList.add("dark-modeTextInput");
+    document.getElementById("micBtn").classList.add("dark-modeSecondary");
+    document.getElementById("suggestions").classList.add("dark-modeSuggestions");
+    document.getElementById("profileMenu").classList.add("dark-modeSecondary");
+
+}

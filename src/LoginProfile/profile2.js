@@ -188,3 +188,12 @@ window.logout = async function () {
     console.error("Logout failed:", err);
   }
 };
+
+
+// ============= Dark Mode =============
+if (localStorage.getItem("darkMode") === "true") {
+
+  document.body.classList.add("dark-modePrimary");
+  document.getElementById("profileContainer").classList.add("dark-modeSecondary");
+  document.getElementById("saveBtn").classList.add("dark-modeSaveButton");
+}

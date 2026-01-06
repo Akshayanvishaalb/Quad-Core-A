@@ -9,7 +9,7 @@ import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/fireb
 // import { doc, getDoc, setDoc } from "firebase/firestore";
 
 const firebaseConfig = {
-    // apiKey: "AIzaSyDXi-16h6fqkvFhyh96rHPSrcUUYI-r1Lw",
+    // apiKey: "",
     apiKey: import.meta.env.VITE_Firebase_API_Key,
     authDomain: "quad-core-a.firebaseapp.com",
     projectId: "quad-core-a",
@@ -41,6 +41,11 @@ export default function MedicalHistory(){
             setAuthReady(true);
         });
 
+        document.getElementById("ContentContainer").classList.add("dark-modePrimary");
+        document.getElementById("med-cond").classList.add("dark-modeSecondary");
+        document.getElementById("allergies").classList.add("dark-modeSecondary");
+        document.getElementById("pst-sur").classList.add("dark-modeSecondary");
+        document.getElementById("chr-cond").classList.add("dark-modeSecondary");
         return unsub;
     }, []);
     // Till here and will continue later
@@ -54,36 +59,6 @@ export default function MedicalHistory(){
             chronic: ""
         }
     );
-
-
-    // React.useEffect(() => {
-    //     const loadHistory = async () => {
-    //         const user = auth.currentUser;
-    //         if (!user) return;
-    //
-    //         const ref = doc(db, "users", user.uid, "medicalHistory", "data");
-    //         const snap = await getDoc(ref);
-    //
-    //         if (snap.exists()) {
-    //         const d = snap.data();
-    //         setConditions(d.conditions || []);
-    //         setAllergies(d.allergies || []);
-    //         setSurgeries(d.surgeries || []);
-    //         setChronics(d.chronics || []);
-    //         setNote(d.note || "");
-    //         } else {
-    //         await setDoc(ref, {
-    //             conditions: [],
-    //             allergies: [],
-    //             surgeries: [],
-    //             chronics: [],
-    //             note: ""
-    //         });
-    //         }
-    //     };
-    //
-    //     loadHistory();
-    // }, []);
 
     React.useEffect(() => {
         if (!authReady || !user) return;
@@ -113,19 +88,6 @@ export default function MedicalHistory(){
         loadHistory();
     }, [authReady, user]);
 
-
-    // async function saveToFirestore(field, value) {
-    //     const user = auth.currentUser;
-    //     console.log("Saving to Firestore", auth.currentUser);  // <- I added this debug statement
-    //     if (!user) return;
-    //
-    //     await setDoc(
-    //         // doc(db, "users", user.uid, "medicalHistory"),
-    //         doc(db, "users", user.uid, "medicalHistory", "data"),
-    //         { [field]: value },
-    //         { merge: true }
-    //     );
-    // }
 
     async function saveToFirestore(field, value) {
         if (!user) {
@@ -244,11 +206,11 @@ export default function MedicalHistory(){
     }
 
     return (
-        <div className="medical-historyContainer">
+        <div className="medical-historyContainer" id="ContentContainer">
             <div className="med-history-page">
             <h2 className="history-title">Medical History</h2>
             <div className = "cards">
-                <div className="card">
+                <div className="card" id={"med-cond"}>
                     <h4>Known Medical Conditions</h4>
                     <InputRow
                     name="condition"
@@ -260,7 +222,7 @@ export default function MedicalHistory(){
                     <ChipList items={conditions} onRemove={removeCondition} />
                     
                 </div>
-                <div className = "card">
+                <div className = "card"id={"allergies"}>
                     <h4>Allergies</h4>
                     <InputRow
                     name="allergy"
@@ -274,7 +236,7 @@ export default function MedicalHistory(){
                 </div>
             </div>
             <div className="cards">
-                <div className = "card">
+                <div className = "card" id={"pst-sur"}>
                     <h4>Past Surgeries</h4>
                     <InputRow
                     name="surgery"
@@ -285,7 +247,7 @@ export default function MedicalHistory(){
                     <ChipList items={surgeries} onRemove={removeSurgery} />
                     
                 </div>
-                <div className = "card">
+                <div className = "card" id={"chr-cond"}>
                     <h4>Chronic Conditions</h4>
                     <InputRow
                     name="chronic"
