@@ -180,7 +180,14 @@ Behavior:
 // DOM ELEMENTS
 // =========================
 const input = document.getElementById("textInput");
-const chat = document.getElementById("chatContainer");
+const chatContainer = document.getElementById("chatContainer");
+chatContainer.appendChild(mapDiv);
+
+mapDiv.style.minHeight = "300px";
+mapDiv.style.width = "100%";
+
+// Force visibility
+mapDiv.scrollIntoView({ behavior: "smooth", block: "center" });
 
 // =========================
 // MEMORY
