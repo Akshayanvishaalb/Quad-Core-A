@@ -17,7 +17,8 @@ An AI-powered system that **assesses symptom urgency (not diagnosis)** and guide
 ## 🛠 Tech Stack
 
 Gemini API · Firestore · Google Maps API · Speech-to-Text · Firebase Hosting
-
+<br>
+RAG Model - https://github.com/AadithiyaaS/RAG-GDG-CureOn
 ---
 
 ## ⚠️ Disclaimer
