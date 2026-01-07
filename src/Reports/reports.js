@@ -1,16 +1,30 @@
+/* =====================
+   Firebase Imports
+===================== */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {
   getStorage,
   ref,
   uploadBytes,
   getDownloadURL,
-  listAll,
   deleteObject
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 import {
   getAuth,
   onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  query,
+  where,
+  orderBy,
+  getDocs,
+  deleteDoc,
+  doc,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 /* =====================
    Firebase Config
@@ -19,15 +33,18 @@ const firebaseConfig = {
   apiKey: import.meta.env.VITE_Firebase_API_Key,
   authDomain: "quad-core-a.firebaseapp.com",
   projectId: "quad-core-a",
-  storageBucket: "quad-core-a.firebasestorage.app",
+  storageBucket: "quad-core-a.appspot.com",
   messagingSenderId: "702554879008",
-  appId: "1:702554879008:web:c502334c89adb58f8f3845",
-  measurementId: "G-L8ZCNH62LF"
+  appId: "1:702554879008:web:c502334c89adb58f8f3845"
 };
 
+/* =====================
+   Firebase Init
+===================== */
 const app = initializeApp(firebaseConfig);
 const storage = getStorage(app);
 const auth = getAuth(app);
+const db = getFirestore(app);
 
 /* =====================
    DOM Elements
@@ -57,41 +74,50 @@ onAuthStateChanged(auth, async (user) => {
    Dark Mode
 ===================== */
 function applyDarkMode() {
-  const isDark = localStorage.getItem("darkMode") === "true";
-  document.body.classList.toggle("dark-mode", isDark);
+  document.body.classList.toggle(
+    "dark-mode",
+    localStorage.getItem("darkMode") === "true"
+  );
 }
-
 document.addEventListener("DOMContentLoaded", applyDarkMode);
 
 /* =====================
    Upload Report
 ===================== */
 uploadBtn.addEventListener("click", async () => {
-  if (!currentUserId) {
-    alert("User not authenticated");
-    return;
-  }
+  if (!currentUserId) return alert("User not authenticated");
 
   const file = reportFile.files[0];
   const name = reportName.value.trim();
 
   if (!file || !name) {
-    alert("Please select a file and enter report name.");
-    return;
+    return alert("Please select a file and enter report name.");
   }
 
   try {
     const filePath = `reports/${currentUserId}/${Date.now()}_${file.name}`;
     const fileRef = ref(storage, filePath);
 
+    // Upload file
     await uploadBytes(fileRef, file);
     const downloadURL = await getDownloadURL(fileRef);
 
+    // Save metadata to Firestore
+    const docRef = await addDoc(collection(db, "reports"), {
+      uid: currentUserId,
+      name,
+      filePath,
+      url: downloadURL,
+      uploadedAt: serverTimestamp()
+    });
+
+    // Update UI immediately
     addReportToUI({
+      id: docRef.id,
       name,
       date: new Date().toLocaleDateString(),
       url: downloadURL,
-      fullPath: filePath
+      filePath
     });
 
     reportsSection.style.display = "block";
@@ -99,7 +125,6 @@ uploadBtn.addEventListener("click", async () => {
     reportName.value = "";
     document.getElementById("fileName").innerText = "No file selected";
 
-    alert("Report uploaded successfully!");
   } catch (err) {
     console.error(err);
     alert("Upload failed");
@@ -107,31 +132,37 @@ uploadBtn.addEventListener("click", async () => {
 });
 
 /* =====================
-   Load User Reports
+   Load Reports (Firestore)
 ===================== */
 async function loadUserReports() {
   reportsContainer.innerHTML = "";
 
-  const userFolderRef = ref(storage, `reports/${currentUserId}`);
-  const result = await listAll(userFolderRef);
+  const q = query(
+    collection(db, "reports"),
+    where("uid", "==", currentUserId),
+    orderBy("uploadedAt", "desc")
+  );
 
-  if (result.items.length === 0) {
+  const snapshot = await getDocs(q);
+
+  if (snapshot.empty) {
     reportsSection.style.display = "none";
     return;
   }
 
   reportsSection.style.display = "block";
 
-  for (const item of result.items) {
-    const url = await getDownloadURL(item);
+  snapshot.forEach(docSnap => {
+    const data = docSnap.data();
 
     addReportToUI({
-      name: item.name.split("_").slice(1).join("_"),
-      date: "—",
-      url,
-      fullPath: item.fullPath
+      id: docSnap.id,
+      name: data.name,
+      date: data.uploadedAt?.toDate().toLocaleDateString(),
+      url: data.url,
+      filePath: data.filePath
     });
-  }
+  });
 }
 
 /* =====================
@@ -146,10 +177,10 @@ function addReportToUI(report) {
       <strong>${report.name}</strong>
       <span>Uploaded on ${report.date}</span>
     </div>
-
     <div class="report-actions">
       <button onclick="window.open('${report.url}', '_blank')">View</button>
-      <button class="delete" onclick="deleteReport('${report.fullPath}', this)">
+      <button class="delete"
+        onclick="deleteReport('${report.id}', '${report.filePath}', this)">
         Delete
       </button>
     </div>
@@ -161,25 +192,25 @@ function addReportToUI(report) {
 /* =====================
    Delete Report
 ===================== */
-async function deleteReport(fullPath, btn) {
+async function deleteReport(docId, filePath, btn) {
   if (!confirm("Delete this report permanently?")) return;
 
   try {
-    const fileRef = ref(storage, fullPath);
-    await deleteObject(fileRef);
+    await deleteObject(ref(storage, filePath));
+    await deleteDoc(doc(db, "reports", docId));
 
     btn.closest(".report-item").remove();
 
     if (reportsContainer.children.length === 0) {
       reportsSection.style.display = "none";
     }
-
-    alert("Report deleted");
   } catch (err) {
     console.error(err);
-    alert("Failed to delete report");
+    alert("Delete failed");
   }
 }
+
+window.deleteReport = deleteReport;
 
 /* =====================
    File Name Display
