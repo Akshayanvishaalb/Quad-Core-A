@@ -346,7 +346,11 @@ function loadDoctorsFromGoogleMaps(lat, lng) {
 function searchDoctors(lat, lng) {
     const location = new google.maps.LatLng(lat, lng);
 
+    // Remove old map if exists
+    document.getElementById("doctorMap")?.remove();
+
     const mapDiv = document.createElement("div");
+    mapDiv.id = "doctorMap";
     mapDiv.style.height = "300px";
     mapDiv.style.marginTop = "12px";
 
@@ -357,29 +361,58 @@ function searchDoctors(lat, lng) {
         zoom: 14
     });
 
+    const bounds = new google.maps.LatLngBounds();
+
+    // User location marker
+    new google.maps.Marker({
+        map,
+        position: location,
+        title: "You are here",
+        icon: {
+            path: google.maps.SymbolPath.CIRCLE,
+            scale: 7,
+            fillColor: "#4285F4",
+            fillOpacity: 1,
+            strokeColor: "#fff",
+            strokeWeight: 2
+        }
+    });
+
+    bounds.extend(location);
+
     const service = new google.maps.places.PlacesService(map);
 
     service.nearbySearch(
-      {
-        location,
-        radius: 5000,
-        keyword: "hospital OR clinic OR doctor"
-      },
-      (results, status) => {
-        if (status !== google.maps.places.PlacesServiceStatus.OK || !results.length) {
-          append("No nearby doctors found.");
-          return;
+        {
+            location,
+            rankBy: google.maps.places.RankBy.DISTANCE,
+            keyword: "hospital clinic doctor"
+        },
+        (results, status) => {
+            if (
+                status !== google.maps.places.PlacesServiceStatus.OK ||
+                !results.length
+            ) {
+                append("No nearby doctors found.");
+                return;
+            }
+
+            results.slice(0, 10).forEach(place => {
+                if (!place.geometry?.location) return;
+
+                new google.maps.Marker({
+                    map,
+                    position: place.geometry.location,
+                    title: place.name
+                });
+
+                bounds.extend(place.geometry.location);
+
+                append(`🏥 <b>${place.name}</b><br>${place.vicinity || ""}`);
+            });
+
+            // Auto-zoom to nearest results
+            map.fitBounds(bounds);
         }
-
-        results.forEach(place => {
-          new google.maps.Marker({
-            map,
-            position: place.geometry.location,
-            title: place.name
-          });
-
-          append(`🏥 <b>${place.name}</b><br>${place.vicinity || ""}`);
-        });
-      }
     );
 }
