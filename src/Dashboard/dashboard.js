@@ -360,26 +360,26 @@ function searchDoctors(lat, lng) {
     const service = new google.maps.places.PlacesService(map);
 
     service.nearbySearch(
-        {
-            location,
-            radius: 3000,
-            type: ["doctor"]
-        },
-        (results, status) => {
-            if (status !== google.maps.places.PlacesServiceStatus.OK) {
-                append("No doctors found nearby.");
-                return;
-            }
-
-            results.forEach(place => {
-                new google.maps.Marker({
-                    map,
-                    position: place.geometry.location,
-                    title: place.name
-                });
-
-                append(`🏥 ${place.name}<br>${place.vicinity || ""}`);
-            });
+      {
+        location,
+        radius: 5000,
+        keyword: "hospital OR clinic OR doctor"
+      },
+      (results, status) => {
+        if (status !== google.maps.places.PlacesServiceStatus.OK || !results.length) {
+          append("No nearby doctors found.");
+          return;
         }
+
+        results.forEach(place => {
+          new google.maps.Marker({
+            map,
+            position: place.geometry.location,
+            title: place.name
+          });
+
+          append(`🏥 <b>${place.name}</b><br>${place.vicinity || ""}`);
+        });
+      }
     );
 }
