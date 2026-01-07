@@ -180,14 +180,7 @@ Behavior:
 // DOM ELEMENTS
 // =========================
 const input = document.getElementById("textInput");
-const chatContainer = document.getElementById("chatContainer");
-chatContainer.appendChild(mapDiv);
-
-mapDiv.style.minHeight = "300px";
-mapDiv.style.width = "100%";
-
-// Force visibility
-mapDiv.scrollIntoView({ behavior: "smooth", block: "center" });
+const chat = document.getElementById("chatContainer");
 
 // =========================
 // MEMORY
@@ -359,9 +352,15 @@ function searchDoctors(lat, lng) {
     const mapDiv = document.createElement("div");
     mapDiv.id = "doctorMap";
     mapDiv.style.height = "300px";
+    mapDiv.style.minHeight = "300px";
+    mapDiv.style.width = "100%";
     mapDiv.style.marginTop = "12px";
 
-    document.getElementById("chatContainer").appendChild(mapDiv);
+    const chatContainer = document.getElementById("chatContainer");
+    chatContainer.appendChild(mapDiv);
+
+    // ✅ mapDiv is defined HERE — safe to use
+    mapDiv.scrollIntoView({ behavior: "smooth", block: "center" });
 
     const map = new google.maps.Map(mapDiv, {
         center: location,
@@ -374,15 +373,7 @@ function searchDoctors(lat, lng) {
     new google.maps.Marker({
         map,
         position: location,
-        title: "You are here",
-        icon: {
-            path: google.maps.SymbolPath.CIRCLE,
-            scale: 7,
-            fillColor: "#4285F4",
-            fillOpacity: 1,
-            strokeColor: "#fff",
-            strokeWeight: 2
-        }
+        title: "You are here"
     });
 
     bounds.extend(location);
@@ -418,7 +409,6 @@ function searchDoctors(lat, lng) {
                 append(`🏥 <b>${place.name}</b><br>${place.vicinity || ""}`);
             });
 
-            // Auto-zoom to nearest results
             map.fitBounds(bounds);
         }
     );
