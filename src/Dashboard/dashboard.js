@@ -117,7 +117,7 @@ textInput.addEventListener('keydown', (e) => {
         // sendBtn.click();
         console.log('Entered');
 
-        appendUserInput(textInput.value.trim());
+        // appendUserInput(textInput.value.trim());
     }
 });
 
@@ -147,6 +147,7 @@ You are a first-aid guidance assistant.
 Your role:
 - Provide ONLY safe, general, non-emergency first-aid or self-care steps
 - Use prior conversation context for follow-up questions
+- If the context provided in each query does not cover explicitly what user asked for, and you had to say "Consult expert.", you shall give little non diagnostic support to the user. But that non diagnostic support should not include medicinal advises etc.
 
 Strict rules:
 - NO diagnosis
@@ -195,23 +196,71 @@ input.addEventListener("keydown", e => {
 // =========================
 // MAIN FUNCTION
 // =========================
+// async function sendMessage() {
+//     const text = input.value.trim();
+//     if (!text) return;
+//
+//     input.value = "";
+//
+//     conversationMemory.push({
+//         role: "user",
+//         content: text
+//     });
+//
+//     conversationMemory = conversationMemory.slice(-MAX_TURNS);
+//
+//     try {
+//         const prompt = buildPrompt(text);
+//
+//         const response = await firstAidModel.generateContent(prompt);
+//
+//         let raw = response.response.text()
+//             .replace(/```json/g, "")
+//             .replace(/```/g, "")
+//             .trim();
+//
+//         const parsed = JSON.parse(raw);
+//         // append(JSON.stringify(parsed, null, 2));
+//         append(formatResponseToString(parsed));
+//
+//         conversationMemory.push({
+//             role: "assistant",
+//             content: raw
+//         });
+//
+//         conversationMemory = conversationMemory.slice(-MAX_TURNS);
+//
+//     } catch (err) {
+//         console.error(err);
+//         append("Unable to generate first-aid guidance.");
+//     }
+// }
+
 async function sendMessage() {
     const text = input.value.trim();
     if (!text) return;
 
     input.value = "";
+    appendUserInput(text);
 
-    conversationMemory.push({
-        role: "user",
-        content: text
-    });
-
+    conversationMemory.push({ role: "user", content: text });
     conversationMemory = conversationMemory.slice(-MAX_TURNS);
 
     try {
-        const prompt = buildPrompt(text);
+        // 🔹 RAG call
+        const ragPrompt = await fetchRagPrompt(text);
 
-        const response = await firstAidModel.generateContent(prompt);
+        // 🔹 Final prompt to Gemini
+        const finalPrompt = `
+${ragPrompt}
+
+PAST CONTEXT:
+${conversationMemory
+            .map(m => `${m.role.toUpperCase()}: ${m.content}`)
+            .join("\n")}
+`;
+
+        const response = await firstAidModel.generateContent(finalPrompt);
 
         let raw = response.response.text()
             .replace(/```json/g, "")
@@ -219,7 +268,6 @@ async function sendMessage() {
             .trim();
 
         const parsed = JSON.parse(raw);
-        // append(JSON.stringify(parsed, null, 2));
         append(formatResponseToString(parsed));
 
         conversationMemory.push({
@@ -235,6 +283,7 @@ async function sendMessage() {
     }
 }
 
+
 // =========================
 // PROMPT BUILDER
 // =========================
@@ -249,6 +298,34 @@ CURRENT INPUT:
 ${currentInput}
 `;
 }
+
+// =========================
+// RAG Connect
+// =========================
+
+async function fetchRagPrompt(userQuery) {
+    console.log(`Fetching Rag prompt for ${userQuery}`);
+    const response = await fetch("https://rag-gdg-cureon.onrender.com/rag", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            query: userQuery,
+            k: 4
+        })
+    });
+    console.log("Received response from RAG");
+    if (!response.ok) {
+        throw new Error("RAG backend failed");
+    }
+
+    const data = await response.json();
+    console.log("Received RAG response", data);
+    // ✅ IMPORTANT: return ONLY the prompt
+    return data.prompt;
+}
+
 
 // =========================
 // UI APPEND (UNCHANGED STYLE)
@@ -306,6 +383,9 @@ if (localStorage.getItem("darkMode") === "true") {
 
 }
 
+
+
+// ========================= Finding Doctors Nearby =====================
 const findDoctorsBtn = document.getElementById("sug3");
 
 findDoctorsBtn.addEventListener("click", () => {
